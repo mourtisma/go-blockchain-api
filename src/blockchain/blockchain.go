@@ -1,9 +1,5 @@
 package blockchain
 
-import (
-
-)
-
 // IBlockChain is the generic interface implemented by our BlockChain model
 type IBlockChain interface {
 	SaveBlock(bock Block)
@@ -30,7 +26,7 @@ func (blockChain *BlockChain) SaveBlock(block *Block) {
 		blockHash := block.ComputeBlockHash()
 		block.SetBlockHash(blockHash)
 	}
-	
+
 	block.LinkToPreviousBlock()
 	blockChain.blocks = append(blockChain.blocks, block)
 }
@@ -42,9 +38,9 @@ func (blockChain *BlockChain) SaveBlock(block *Block) {
 func (blockChain *BlockChain) IsValid(block *Block) bool {
 	blockHash := block.ComputeBlockHash()
 
-	if (block.nextBlock == nil) {
+	if block.nextBlock == nil {
 		return blockHash == block.blockHash
-	} else {
-		return blockHash == block.blockHash && blockChain.IsValid(block.nextBlock)
 	}
+
+	return blockHash == block.blockHash && blockChain.IsValid(block.nextBlock)
 }

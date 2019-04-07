@@ -23,7 +23,7 @@ type Block struct {
 // ComputeBlockHash calculates the base-64 encoding of the SHA-256 block checksum
 func (block *Block) ComputeBlockHash() string {
 	h := sha256.New()
-	if (block.previousBlock == nil) {
+	if block.previousBlock == nil {
 		h.Write([]byte(block.data))
 	} else {
 		previousBlock := block.previousBlock
