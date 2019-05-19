@@ -1,5 +1,10 @@
 package blockchain
 
+import (
+	"blockchain/keyStore"
+	"crypto/dsa"
+)
+
 // IBlockChain is the generic interface implemented by our BlockChain model
 type IBlockChain interface {
 	SaveBlock(bock Block)
@@ -7,14 +12,16 @@ type IBlockChain interface {
 
 // BlockChain struct represent a basic BlockChain model
 type BlockChain struct {
+	keyStore keyStore.KeyStore
 	blocks []*Block
 }
 
 // CreateGenesisBlock starts the chain by creating its header block
 func (blockChain *BlockChain) CreateGenesisBlock(data string) Block {
-	block := Block{data, "", nil, nil}
+	block := Block{data, "", nil, nil, nil,}
 	blockHash := block.ComputeBlockHash()
 	block.SetBlockHash(blockHash)
+	block.Sign(blockChain.keyStore)
 	return block
 }
 
@@ -27,6 +34,10 @@ func (blockChain *BlockChain) SaveBlock(block *Block) {
 		block.SetBlockHash(blockHash)
 	}
 
+	if (block.digitalSignature == nil) {
+		block.Sign(blockChain.keyStore)
+	}
+
 	block.LinkToPreviousBlock()
 	blockChain.blocks = append(blockChain.blocks, block)
 }
@@ -37,10 +48,18 @@ func (blockChain *BlockChain) SaveBlock(block *Block) {
 // the chain's integrity
 func (blockChain *BlockChain) IsValid(block *Block) bool {
 	blockHash := block.ComputeBlockHash()
+	signature, _ := block.ComputeDigitalSignature(blockChain.keyStore)
 
 	if block.nextBlock == nil {
-		return blockHash == block.blockHash
+		return blockHash == block.blockHash && dsa.Verify(blockChain.keyStore.PublicKey, 
+														  []byte(blockHash), 
+														  signature.r, 
+														  signature.s)
 	}
 
-	return blockHash == block.blockHash && blockChain.IsValid(block.nextBlock)
+	hashAndSignatureValid := blockHash == block.blockHash && dsa.Verify(blockChain.keyStore.PublicKey, 
+		[]byte(blockHash), 
+		signature.r, 
+		signature.s)
+	return hashAndSignatureValid && blockChain.IsValid(block.nextBlock)
 }

@@ -2,8 +2,10 @@ package blockchain
 
 import (
 	"crypto/sha256"
+	"crypto/dsa"
 	"encoding/base64"
 	"testing"
+	"blockchain/keyStore"
 )
 
 func TestCreateGenesisBlock(t *testing.T) {
@@ -13,8 +15,13 @@ func TestCreateGenesisBlock(t *testing.T) {
 	hash := h.Sum(nil)
 	expectedHash := base64.StdEncoding.EncodeToString(hash)
 
-	blockChain := BlockChain{}
+	keyStore := keyStore.KeyStore{}
+	keyStore.GenerateKeys()
+
+	blockChain := BlockChain{keyStore: keyStore}
 	block := blockChain.CreateGenesisBlock("hello world")
+
+	verifystatus := dsa.Verify(keyStore.PublicKey, []byte(expectedHash), block.digitalSignature.r, block.digitalSignature.s)
 
 	if block.nextBlock != nil {
 		t.Errorf("Genesis block shouldn't point to a block when created")
@@ -29,12 +36,20 @@ func TestCreateGenesisBlock(t *testing.T) {
 			actualHash, expectedHash)
 	}
 
+	if verifystatus != true {
+		t.Errorf("New block is not valid")
+	}
+
 }
 
 func TestSaveBlock(t *testing.T) {
+	keyStore := keyStore.KeyStore{}
+	keyStore.GenerateKeys()
+
 	firstBlock := Block{
 		"firstBlock",
 		"abcd",
+		nil,
 		nil,
 		nil,
 	}
@@ -45,6 +60,7 @@ func TestSaveBlock(t *testing.T) {
 	expectedHash := base64.StdEncoding.EncodeToString(hash)
 
 	blockChain := BlockChain{
+		keyStore,
 		[]*Block{&firstBlock},
 	}
 
@@ -53,14 +69,22 @@ func TestSaveBlock(t *testing.T) {
 		"",
 		&firstBlock,
 		nil,
+		nil,
 	}
 
 	blockChain.SaveBlock(&newBlock)
+
+	verifystatus := dsa.Verify(keyStore.PublicKey, []byte(expectedHash), newBlock.digitalSignature.r, newBlock.digitalSignature.s)
 
 	// Validate hash
 	if actualHash := newBlock.blockHash; actualHash != expectedHash {
 		t.Errorf("New block got wrong hash: got %v want %v",
 			actualHash, expectedHash)
+	}
+
+	// Validate signature
+	if verifystatus != true {
+		t.Errorf("New block is not valid")
 	}
 
 	// Validate chain size
@@ -86,10 +110,12 @@ func TestSaveBlock(t *testing.T) {
 }
 
 func TestIsValid(t *testing.T) {
-
+	keyStore := keyStore.KeyStore{}
+	keyStore.GenerateKeys()
 	firstBlock := Block{
 		"firstBlock",
 		"",
+		nil,
 		nil,
 		nil,
 	}
@@ -105,6 +131,7 @@ func TestIsValid(t *testing.T) {
 		"secondBlock",
 		"",
 		&firstBlock,
+		nil,
 		nil,
 	}
 
@@ -117,6 +144,7 @@ func TestIsValid(t *testing.T) {
 	firstBlock.nextBlock = &secondBlock
 
 	blockChain := BlockChain{
+		keyStore,
 		[]*Block{&firstBlock, &secondBlock},
 	}
 
@@ -127,9 +155,13 @@ func TestIsValid(t *testing.T) {
 
 func TestIsCorrupt(t *testing.T) {
 
+	keyStore := keyStore.KeyStore{}
+	keyStore.GenerateKeys()
+
 	firstBlock := Block{
 		"firstBlock",
 		"abcd",
+		nil,
 		nil,
 		nil,
 	}
@@ -146,6 +178,7 @@ func TestIsCorrupt(t *testing.T) {
 		"",
 		&firstBlock,
 		nil,
+		nil,
 	}
 
 	secondBlock.blockHash = "deadbeef"
@@ -153,6 +186,7 @@ func TestIsCorrupt(t *testing.T) {
 	firstBlock.nextBlock = &secondBlock
 
 	blockChain := BlockChain{
+		keyStore,
 		[]*Block{&firstBlock, &secondBlock},
 	}
 

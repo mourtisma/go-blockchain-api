@@ -2,14 +2,17 @@ package blockchain
 
 import (
 	"crypto/sha256"
+	"crypto/dsa"
 	"encoding/base64"
 	"testing"
+	"blockchain/keyStore"
 )
 
-func TestSetBlockHash(t *testing.T) {
+func TestComputeBlockHash(t *testing.T) {
 	previousBlock := Block{
 		"prevBlock",
 		"abcd",
+		nil,
 		nil,
 		nil,
 	}
@@ -18,6 +21,7 @@ func TestSetBlockHash(t *testing.T) {
 		"block",
 		"",
 		&previousBlock,
+		nil,
 		nil,
 	}
 
@@ -34,10 +38,34 @@ func TestSetBlockHash(t *testing.T) {
 
 }
 
+func TestComputeDigitalSignature(t *testing.T) {
+	keyStore := keyStore.KeyStore{}
+	keyStore.GenerateKeys()
+
+	block := Block{
+		"block",
+		"abcd",
+		nil,
+		nil,
+		nil,
+	}
+
+	hash := []byte(block.blockHash)
+
+	signature, _ := block.ComputeDigitalSignature(keyStore)
+	verifystatus := dsa.Verify(keyStore.PublicKey, hash, signature.r, signature.s)
+
+	if verifystatus != true {
+		t.Errorf("Block has failed verification while it shouldn't")
+	}
+	   
+}
+
 func TestLinkToPreviousBlock(t *testing.T) {
 	previousBlock := Block{
 		"prevBlock",
 		"abcd",
+		nil,
 		nil,
 		nil,
 	}
@@ -46,6 +74,7 @@ func TestLinkToPreviousBlock(t *testing.T) {
 		"block",
 		"",
 		&previousBlock,
+		nil,
 		nil,
 	}
 
