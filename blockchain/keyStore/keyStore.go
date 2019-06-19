@@ -1,9 +1,9 @@
 package keyStore
 
 import (
-	"errors"
 	"crypto/dsa"
 	"crypto/rand"
+	"errors"
 )
 
 type IkeyStore interface {
@@ -11,7 +11,7 @@ type IkeyStore interface {
 }
 
 type KeyStore struct {
-	PublicKey *dsa.PublicKey
+	PublicKey  *dsa.PublicKey
 	PrivateKey *dsa.PrivateKey
 }
 

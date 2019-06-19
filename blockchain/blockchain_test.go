@@ -1,11 +1,11 @@
 package blockchain
 
 import (
-	"crypto/sha256"
 	"crypto/dsa"
+	"crypto/sha256"
 	"encoding/base64"
-	"testing"
 	"github.com/mourtisma/go-blockchain-api/blockchain/keyStore"
+	"testing"
 )
 
 func TestCreateGenesisBlock(t *testing.T) {

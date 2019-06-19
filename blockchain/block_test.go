@@ -1,11 +1,11 @@
 package blockchain
 
 import (
-	"crypto/sha256"
 	"crypto/dsa"
+	"crypto/sha256"
 	"encoding/base64"
-	"testing"
 	"github.com/mourtisma/go-blockchain-api/blockchain/keyStore"
+	"testing"
 )
 
 func TestComputeBlockHash(t *testing.T) {
@@ -58,7 +58,7 @@ func TestComputeDigitalSignature(t *testing.T) {
 	if verifystatus != true {
 		t.Errorf("Block has failed verification while it shouldn't")
 	}
-	   
+
 }
 
 func TestLinkToPreviousBlock(t *testing.T) {

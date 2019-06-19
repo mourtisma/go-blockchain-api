@@ -1,11 +1,11 @@
 package blockchain
 
 import (
-	"errors"
-	"crypto/sha256"
-	"crypto/rand"
 	"crypto/dsa"
+	"crypto/rand"
+	"crypto/sha256"
 	"encoding/base64"
+	"errors"
 	"github.com/mourtisma/go-blockchain-api/blockchain/keyStore"
 	"math/big"
 )
@@ -21,10 +21,10 @@ type IBlock interface {
 
 // Block struct represents a chain's block
 type Block struct {
-	data          string
-	blockHash     string
-	previousBlock *Block
-	nextBlock     *Block
+	data             string
+	blockHash        string
+	previousBlock    *Block
+	nextBlock        *Block
 	digitalSignature *DigitalSignature
 }
 
@@ -49,7 +49,7 @@ func (block *Block) ComputeBlockHash() string {
 // SetBlockHash is a simple setter
 func (block *Block) SetBlockHash(blockHash string) {
 	block.blockHash = blockHash
-} 
+}
 
 // ComputeDigitalSignature computes the digital signature of a block, given a KeyStore
 func (block *Block) ComputeDigitalSignature(ks keyStore.KeyStore) (*DigitalSignature, error) {
@@ -59,7 +59,7 @@ func (block *Block) ComputeDigitalSignature(ks keyStore.KeyStore) (*DigitalSigna
 		return nil, err
 	}
 
-	return &DigitalSignature{r, s}, nil 
+	return &DigitalSignature{r, s}, nil
 }
 
 // Sign computes the digital signature of a block, given a KeyStore, and signs it

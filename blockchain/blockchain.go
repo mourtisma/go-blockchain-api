@@ -1,8 +1,8 @@
 package blockchain
 
 import (
-	"github.com/mourtisma/go-blockchain-api/blockchain/keyStore"
 	"crypto/dsa"
+	"github.com/mourtisma/go-blockchain-api/blockchain/keyStore"
 )
 
 // IBlockChain is the generic interface implemented by our BlockChain model
@@ -13,12 +13,12 @@ type IBlockChain interface {
 // BlockChain struct represent a basic BlockChain model
 type BlockChain struct {
 	keyStore keyStore.KeyStore
-	blocks []*Block
+	blocks   []*Block
 }
 
 // CreateGenesisBlock starts the chain by creating its header block
 func (blockChain *BlockChain) CreateGenesisBlock(data string) Block {
-	block := Block{data, "", nil, nil, nil,}
+	block := Block{data, "", nil, nil, nil}
 	blockHash := block.ComputeBlockHash()
 	block.SetBlockHash(blockHash)
 	block.Sign(blockChain.keyStore)
@@ -34,7 +34,7 @@ func (blockChain *BlockChain) SaveBlock(block *Block) {
 		block.SetBlockHash(blockHash)
 	}
 
-	if (block.digitalSignature == nil) {
+	if block.digitalSignature == nil {
 		block.Sign(blockChain.keyStore)
 	}
 
@@ -51,15 +51,15 @@ func (blockChain *BlockChain) IsValid(block *Block) bool {
 	signature, _ := block.ComputeDigitalSignature(blockChain.keyStore)
 
 	if block.nextBlock == nil {
-		return blockHash == block.blockHash && dsa.Verify(blockChain.keyStore.PublicKey, 
-														  []byte(blockHash), 
-														  signature.r, 
-														  signature.s)
+		return blockHash == block.blockHash && dsa.Verify(blockChain.keyStore.PublicKey,
+			[]byte(blockHash),
+			signature.r,
+			signature.s)
 	}
 
-	hashAndSignatureValid := blockHash == block.blockHash && dsa.Verify(blockChain.keyStore.PublicKey, 
-		[]byte(blockHash), 
-		signature.r, 
+	hashAndSignatureValid := blockHash == block.blockHash && dsa.Verify(blockChain.keyStore.PublicKey,
+		[]byte(blockHash),
+		signature.r,
 		signature.s)
 	return hashAndSignatureValid && blockChain.IsValid(block.nextBlock)
 }
