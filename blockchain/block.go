@@ -58,8 +58,6 @@ func (block *Block) ComputeDigitalSignature(ks keyStore.KeyStore) (*DigitalSigna
 		err := errors.New("Error signing the hash")
 		return nil, err
 	}
-	signature := r.Bytes()
-	signature = append(signature, s.Bytes()...)
 
 	return &DigitalSignature{r, s}, nil 
 }
