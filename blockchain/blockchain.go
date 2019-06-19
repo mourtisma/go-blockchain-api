@@ -1,7 +1,7 @@
 package blockchain
 
 import (
-	"blockchain/keyStore"
+	"github.com/mourtisma/go-blockchain-api/blockchain/keyStore"
 	"crypto/dsa"
 )
 

@@ -6,7 +6,7 @@ import (
 	"crypto/rand"
 	"crypto/dsa"
 	"encoding/base64"
-	"blockchain/keyStore"
+	"github.com/mourtisma/go-blockchain-api/blockchain/keyStore"
 	"math/big"
 )
 

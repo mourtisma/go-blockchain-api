@@ -17,5 +17,5 @@ pkg/
 .vscode/
 
 # Dependencies
-src/github.com/
-src/golang.org/
+github.com/
+golang.org/

@@ -5,7 +5,7 @@ import (
 	"crypto/dsa"
 	"encoding/base64"
 	"testing"
-	"blockchain/keyStore"
+	"github.com/mourtisma/go-blockchain-api/blockchain/keyStore"
 )
 
 func TestComputeBlockHash(t *testing.T) {
